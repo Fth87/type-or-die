@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Pygame assets - keep original source images/audio under version control
+# but ignore generated files like atlases or large binaries you don't want in Git
+assets/.cache/
+assets/*.pyc
