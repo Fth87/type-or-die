@@ -1,35 +1,112 @@
-import random
 import pygame
+import os
 from .character import Character
 from settings import TEXT_COLOR
 
-
 class Zombie(Character):
+    FRAMES = []
+    FALL_IMAGE = None
+    ANIMATION_SPEED = 0.1
+    SIZE = (80, 80)
+
     def __init__(self, pos, word, speed=60):
         super().__init__(pos)
         self.word = word
         self.speed = speed
         self.progress = 0
         self.font = pygame.font.SysFont(None, 30)
-        self.image.fill((80, 180, 80))
+        self.dying = False
+        self.death_timer = 0.0
+        self.DEATH_DURATION = 1.0
+
+        if not Zombie.FRAMES or not Zombie.FALL_IMAGE:
+            self._load_assets()
+
+        self.current_frame_index = 0
+        self.animation_timer = 0.0
+
+        if Zombie.FRAMES:
+            self.image = Zombie.FRAMES[0]
+            self.rect = self.image.get_rect(center=pos)
+        else:
+            self.image = pygame.Surface(Zombie.SIZE, pygame.SRCALPHA)
+            self.image.fill((80, 180, 80))
+            self.rect = self.image.get_rect(center=pos)
+
+    def _load_assets(self):
+        base_path = "assets/char/Zombie"
+        if not Zombie.FRAMES:
+            for i in range(8):
+                filename = f"walk{i}.png"
+                full_path = os.path.join(base_path, filename)
+                if os.path.exists(full_path):
+                    try:
+                        img = pygame.image.load(full_path).convert_alpha()
+                        img = pygame.transform.scale(img, Zombie.SIZE)
+                        Zombie.FRAMES.append(img)
+                    except pygame.error:
+                        pass
+
+        if not Zombie.FALL_IMAGE:
+            fall_path = os.path.join(base_path, "fall.png")
+            if os.path.exists(fall_path):
+                try:
+                    img = pygame.image.load(fall_path).convert_alpha()
+                    Zombie.FALL_IMAGE = pygame.transform.scale(img, Zombie.SIZE)
+                except pygame.error:
+                    pass
 
     def update(self, dt):
+        if self.dying:
+            self.death_timer += dt
+            return
+
         self.rect.x += int(self.speed * dt)
 
-    def is_dead(self):
+        if Zombie.FRAMES:
+            self.animation_timer += dt
+            if self.animation_timer >= Zombie.ANIMATION_SPEED:
+                self.animation_timer = 0.0
+                self.current_frame_index = (self.current_frame_index + 1) % len(Zombie.FRAMES)
+                self.image = Zombie.FRAMES[self.current_frame_index]
+
+    def start_dying(self):
+        self.dying = True
+        if Zombie.FALL_IMAGE:
+            self.image = Zombie.FALL_IMAGE
+            old_center = self.rect.center
+            self.rect = self.image.get_rect(center=old_center)
+            self.rect.y += 10
+
+    def is_word_complete(self):
         return self.progress >= len(self.word)
 
+    def is_dead(self):
+        return self.dying and self.death_timer >= self.DEATH_DURATION
+
     def type_char(self, char):
-        # check next char in word
+        if self.dying:
+            return False
+
         if self.word[self.progress] == char:
             self.progress += 1
+            if self.progress >= len(self.word):
+                self.start_dying()
+                return "KILLED"
             return True
         return False
 
     def draw(self, screen):
+        if self.dying:
+            alpha = max(0, 255 - int((self.death_timer / self.DEATH_DURATION) * 255))
+            self.image.set_alpha(alpha)
+            screen.blit(self.image, self.rect)
+            return
+
         screen.blit(self.image, self.rect)
         txt = self.font.render(self.word, True, TEXT_COLOR)
-        screen.blit(txt, (self.rect.x + 6, self.rect.y + 6))
-        # draw progress underline
-        progress_txt = self.font.render(self.word[: self.progress], True, (100, 255, 100))
-        screen.blit(progress_txt, (self.rect.x + 6, self.rect.y + 30))
+        text_x = self.rect.centerx - (txt.get_width() // 2)
+        text_y = self.rect.top - 25
+        screen.blit(txt, (text_x, text_y))
+        progress_txt = self.font.render(self.word[: self.progress], True, (255, 0, 0))
+        screen.blit(progress_txt, (text_x, text_y))

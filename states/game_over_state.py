@@ -1,8 +1,7 @@
 import pygame
 from core.state import State
+from core.score_manager import ScoreManager
 from settings import WIDTH, HEIGHT, BG_COLOR, TEXT_COLOR
- 
-
 
 class GameOverState(State):
     def __init__(self, game, score=0):
@@ -11,6 +10,7 @@ class GameOverState(State):
         self.title_font = pygame.font.SysFont(None, 48)
         self.font = pygame.font.SysFont(None, 24)
         self.score = score
+        ScoreManager.save_score(score)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
