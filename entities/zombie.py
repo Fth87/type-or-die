@@ -18,6 +18,7 @@ class Zombie(Character):
         self.dying = False
         self.death_timer = 0.0
         self.DEATH_DURATION = 1.0
+        self.exact_x = float(pos[0])
 
         if not Zombie.FRAMES or not Zombie.FALL_IMAGE:
             self._load_assets()
@@ -61,7 +62,8 @@ class Zombie(Character):
             self.death_timer += dt
             return
 
-        self.rect.x += int(self.speed * dt)
+        self.exact_x += self.speed * dt
+        self.rect.x = int(self.exact_x)
 
         if Zombie.FRAMES:
             self.animation_timer += dt
