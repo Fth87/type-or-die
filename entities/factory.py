@@ -20,7 +20,8 @@ class EntityFactory:
         return Player()
 
     @staticmethod
-    def create_zombie():
+    def create_zombie(speed_min, speed_max):
         word = random.choice(EntityFactory.WORDS)
         y = random.randint(80, HEIGHT - 80)
-        return Zombie((ZOMBIE_START_X, y), word, speed=random.randint(40, 100))
+        final_speed = random.randint(max(10, int(speed_min)), max(20, int(speed_max))) 
+        return Zombie((ZOMBIE_START_X, y), word, speed=final_speed)
