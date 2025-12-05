@@ -2,18 +2,13 @@ import random
 from .player import Player
 from .zombie import Zombie
 from settings import ZOMBIE_START_X, HEIGHT
+import json
 
 
 class EntityFactory:
-    WORDS = [
-        "code",
-        "python",
-        "zombie",
-        "type",
-        "keyboard",
-        "skill",
-        "death",
-    ]
+    with open('assets/static/indonesian.json', 'r') as f:
+        data = json.load(f)
+    WORDS = data['words']
 
     @staticmethod
     def create_player():
