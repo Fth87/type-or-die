@@ -35,7 +35,7 @@ class Zombie(Character):
             self.rect = self.image.get_rect(center=pos)
 
     def _load_assets(self):
-        base_path = "assets/char/Zombie"
+        base_path = "assets/images/char/Zombie"
         if not Zombie.FRAMES:
             for i in range(8):
                 filename = f"walk{i}.png"

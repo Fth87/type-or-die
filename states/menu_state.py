@@ -9,7 +9,7 @@ class MenuState(State):
         super().__init__(game)
         pygame.font.init()
         
-        bg_path = "assets/field/PNG/background_menu_state.png"
+        bg_path = "assets/images/field/PNG/background_menu_state.png"
         if os.path.exists(bg_path):
             try:
                 raw_image = pygame.image.load(bg_path).convert()
@@ -20,9 +20,9 @@ class MenuState(State):
             self.background = None
 
         try:
-            self.title_font = pygame.font.Font("assets/zombie.otf", 72)
-            self.menu_font = pygame.font.Font("assets/font.ttf", 40)
-            self.score_font = pygame.font.Font("assets/font.ttf", 30)
+            self.title_font = pygame.font.Font("assets/fonts/zombie.otf", 72)
+            self.menu_font = pygame.font.Font("assets/fonts/font.ttf", 40)
+            self.score_font = pygame.font.Font("assets/fonts/font.ttf", 30)
         except FileNotFoundError:
             self.title_font = pygame.font.SysFont(None, 72)
             self.menu_font = pygame.font.SysFont(None, 40)
