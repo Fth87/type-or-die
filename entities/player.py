@@ -4,7 +4,17 @@ from settings import WIDTH, HEIGHT
 from core.animation import load_gif_frames
 
 class Player(Character):
+    """
+    Kelas yang merepresentasikan pemain (Player).
+    
+    Menangani input pergerakan, rendering karakter, sistem HP, dan animasi ledakan.
+    """
     def __init__(self):
+        """
+        Inisialisasi pemain.
+        
+        Memuat aset gambar, mengatur posisi awal, sistem HP, dan laser.
+        """
         super().__init__((0, 0))
         # Load image from assets
         try:
@@ -45,6 +55,14 @@ class Player(Character):
         self.typed = ""
 
     def update(self, dt):
+        """
+        Memperbarui status pemain setiap frame.
+        
+        Menangani pergerakan berdasarkan input keyboard dan animasi ledakan jika aktif.
+
+        Args:
+            dt (float): Waktu delta.
+        """
         if self.exploding:
             self.explosion_timer += dt
             if self.explosion_timer >= self.EXPLOSION_SPEED:
@@ -69,23 +87,44 @@ class Player(Character):
         self.laser_rect.x = 0 
 
     def type_char(self, char):
+        """
+        Menambahkan karakter ke buffer pengetikan (tidak digunakan secara aktif dalam logika saat ini).
+
+        Args:
+            char (str): Karakter yang diketik.
+        """
         self.typed += char
 
     def clear_typed(self):
+        """
+        Membersihkan buffer pengetikan.
+        """
         self.typed = ""
 
     def set_laser_active(self, active):
+        """
+        Mengubah warna laser berdasarkan status aktif (membidik target).
+
+        Args:
+            active (bool): True jika laser sedang membidik zombie, False jika tidak.
+        """
         if active:
             self.laser_color = (255, 50, 50) # Reddish when aiming at zombie
         else:
             self.laser_color = (0, 255, 255) # Cyan default
 
     def take_damage(self):
+        """
+        Mengurangi HP pemain sebesar 1 poin.
+        """
         self.hp -= 1
         if self.hp < 0:
             self.hp = 0
 
     def explode(self):
+        """
+        Memulai animasi ledakan pemain.
+        """
         if not self.exploding and self.explosion_frames:
             self.exploding = True
             self.explosion_index = 0
@@ -93,6 +132,12 @@ class Player(Character):
             self.rect = self.image.get_rect(center=self.rect.center)
 
     def draw_ui(self, surface):
+        """
+        Menggambar elemen UI pemain (laser, karakter, HP bar).
+
+        Args:
+            surface (pygame.Surface): Surface tujuan penggambaran.
+        """
         if not self.exploding:
             pygame.draw.rect(surface, self.laser_color, self.laser_rect)
         

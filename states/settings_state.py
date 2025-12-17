@@ -4,7 +4,18 @@ from core.state import State
 from settings import WIDTH, HEIGHT, BG_COLOR, TEXT_COLOR
 
 class SettingsState(State):
+    """
+    State untuk menu Pengaturan.
+    
+    Memungkinkan pemain mengubah volume musik, tingkat kesulitan,
+    dan kembali ke menu utama.
+    """
     def __init__(self, game):
+        """
+        Inisialisasi SettingsState.
+        
+        Menyiapkan opsi pengaturan (Volume, Difficulty, Back).
+        """
         super().__init__(game)
         pygame.font.init()
         
@@ -26,6 +37,8 @@ class SettingsState(State):
             self.title_font = pygame.font.SysFont(None, 50)
             self.option_font = pygame.font.SysFont(None, 32)
 
+        self.hint_font = pygame.font.SysFont(None, 24)
+
         self.settings_data = [
             {
                 "label": "Music Volume",
@@ -36,12 +49,6 @@ class SettingsState(State):
                 "step": 10
             },
             {
-                "label": "Difficulty",
-                "type": "select",
-                "value": 0, # Index dari choices
-                "choices": ["Easy", "Normal", "Hard", "Insane"]
-            },
-            {
                 "label": "Back",
                 "type": "button"
             }
@@ -49,6 +56,13 @@ class SettingsState(State):
         self.selected_index = 0
 
     def handle_event(self, event):
+        """
+        Menangani input navigasi dan perubahan nilai pengaturan.
+        
+        Panah Atas/Bawah: Navigasi menu.
+        Panah Kiri/Kanan: Mengubah nilai (Volume/Difficulty).
+        Enter: Memilih opsi (Back).
+        """
         if event.type == pygame.KEYDOWN:
             current_item = self.settings_data[self.selected_index]
 
@@ -84,9 +98,15 @@ class SettingsState(State):
             self.game.quit()
 
     def update(self, dt):
+        """
+        Update logika pengaturan (tidak ada logika khusus saat ini).
+        """
         pass
 
     def draw(self, screen):
+        """
+        Menggambar menu pengaturan ke layar.
+        """
         if self.background:
             screen.blit(self.background, (0, 0))
         else:
@@ -123,6 +143,5 @@ class SettingsState(State):
             screen.blit(text_surf, text_rect)
 
 
-        hint_font = pygame.font.SysFont(None, 24)
-        hint = hint_font.render("Use ARROW KEYS to change values | ENTER to select", True, (200, 200, 200))
+        hint = self.hint_font.render("Use ARROW KEYS to change values | ENTER to select", True, (200, 200, 200))
         screen.blit(hint, (WIDTH // 2 - hint.get_width() // 2, HEIGHT - 40))

@@ -3,9 +3,22 @@ import math
 from core.animation import load_gif_frames
 
 class Projectile(pygame.sprite.Sprite):
+    """
+    Kelas yang merepresentasikan proyektil (peluru) yang ditembakkan pemain.
+    
+    Menangani pergerakan peluru menuju target dan animasi rotasi.
+    """
     FRAMES = []
 
     def __init__(self, start_pos, target_pos, speed=2500):
+        """
+        Inisialisasi proyektil.
+
+        Args:
+            start_pos (tuple): Posisi awal peluru.
+            target_pos (tuple): Posisi target (zombie).
+            speed (int): Kecepatan peluru.
+        """
         super().__init__()
         if not Projectile.FRAMES:
             # Load frames once
@@ -33,13 +46,19 @@ class Projectile(pygame.sprite.Sprite):
         # The sprite faces UP by default. We need to correct this.
         # atan2 returns angle from X axis (Right).
         # We subtract 90 degrees to align UP-facing sprite to the calculated angle.
-        self.angle = math.degrees(math.atan2(-direction.y, direction.x)) + 90
+        self.angle = math.degrees(math.atan2(-direction.y, direction.x)) - 90
         
         # Rotate initial image
         self.image = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self, dt):
+        """
+        Memperbarui posisi dan animasi peluru.
+
+        Args:
+            dt (float): Waktu delta.
+        """
         self.pos += self.velocity * dt
         self.rect.center = self.pos
         

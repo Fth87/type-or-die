@@ -3,7 +3,14 @@ from PIL import Image
 
 def load_gif_frames(path, scale_size=None):
     """
-    Loads frames from a GIF file using PIL and converts them to Pygame surfaces.
+    Memuat frame-frame dari file GIF menggunakan PIL dan mengonversinya menjadi surface Pygame.
+
+    Args:
+        path (str): Path ke file GIF.
+        scale_size (tuple, optional): Ukuran target (width, height) untuk mengubah skala setiap frame.
+
+    Returns:
+        list: Daftar objek pygame.Surface yang merepresentasikan setiap frame animasi.
     """
     frames = []
     try:

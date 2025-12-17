@@ -1,3 +1,9 @@
+"""
+Modul Pengaturan (Settings)
+
+Modul ini berisi semua konstanta konfigurasi untuk permainan Type Or Die.
+Termasuk pengaturan layar, warna, posisi, dan parameter gameplay.
+"""
 
 WIDTH = 1920
 HEIGHT = 1080

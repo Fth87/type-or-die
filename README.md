@@ -1,134 +1,102 @@
-# Type Or Die — Pygame
+# Type Or Die
 
-Langkah memulai
+**Type Or Die** adalah game survival mengetik cepat (typing game) yang dibangun menggunakan **Python** dan library **Pygame**. Pemain berperan sebagai survivor yang harus bertahan hidup dari serangan gelombang zombie dengan cara mengetik kata-kata yang muncul di atas kepala mereka.
 
-1. Buat dan aktifkan virtual environment:
+Proyek ini dikembangkan sebagai Tugas Akhir mata kuliah Pemrograman Berorientasi Objek (PBO), menerapkan prinsip-prinsip OOP.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
+## 🎮 Fitur Utama
 
-2. Instal dependensi (termasuk tools pengembangan / testing):
+- **Mekanik Mengetik Cepat**: Ketik kata dengan akurat untuk menembak dan mengalahkan zombie.
+- **Sistem Gelombang Dinamis**: Menggunakan `AIDirector` untuk mengatur spawn rate dan kecepatan zombie yang semakin sulit seiring bertambahnya skor.
+- **Visual & Animasi**:
+  - Animasi sprite karakter dan zombie yang halus.
+  - Efek partikel ledakan saat zombie mati atau pemain kalah.
+  - Visualisasi HP Bar dan Laser Sight dinamis (berubah warna saat membidik).
+  - Dukungan resolusi Fullscreen (1920x1080 Scaled).
+- **Sistem Skor**: Penyimpanan High Score lokal menggunakan JSON.
+- **Manajemen State**: Transisi mulus antara Menu, Gameplay, Pengaturan, dan Game Over.
 
-```bash
-pip install -r requirements.txt
-```
+## 🛠️ Instalasi & Cara Menjalankan
 
-3. Jalankan game:
+Pastikan Anda telah menginstal **Python 3.10** atau lebih baru.
 
-```bash
-python main.py
-```
+1.  **Buat Virtual Environment** (Disarankan):
 
-## Project structure and file responsibilities
+    ```bash
+    # Linux / Mac
+    python -m venv .venv
+    source .venv/bin/activate
 
-Berikut penjelasan tiap file/folder di proyek ini dan apa fungsinya:
+    # Windows
+    python -m venv .venv
+    .venv\Scripts\activate
+    ```
 
-- `main.py`
+2.  **Instal Dependensi**:
 
-  - Entry point aplikasi. Memulai `Game` dengan initial state (`MenuState`).
-  - Singkat: startup + run loop.
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-- `settings.py`
+3.  **Jalankan Game**:
+    ```bash
+    python main.py
+    ```
 
-  - Semua konstanta global (lebar/tinggi layar, FPS, warna, posisi default, spawn timer).
-  - Gunakan file ini untuk mengatur parameter gameplay (difficulty, spawn rate).
+## 📂 Struktur Kode & Arsitektur
 
-- `core/`
+Proyek ini dirancang dengan struktur modular yang rapi, memisahkan logika inti, entitas game, dan tampilan (state).
 
-  - `core/state.py` — base class `State` (abstract). Kontrak: setiap state harus implement `handle_event(event)`, `update(dt)`, dan `draw(screen)`.
-  - `core/game.py` — pengelola state dan loop utama. Menerima class state awal dan memiliki method `change_state`, `quit`, dll.
+### 1. Core (`core/`)
 
-- `states/`
+Bagian ini berisi logika dasar engine permainan.
 
-  - `menu_state.py` — tampilan dan input pada menu utama. Menangani transisi ke `GameState`.
-  - `game_state.py` — logika permainan utama: spawn zombie, memproses input typing, update & check game over.
-  - `game_over_state.py` — menampilkan skor akhir dan mengijinkan pemain kembali ke menu.
+- **`game.py`**: Mengelola **Game Loop** utama, inisialisasi Pygame, dan manajemen transisi antar state.
+- **`state.py`**: _Abstract Base Class_ yang menerapkan **State Pattern**. Setiap halaman (Menu, Game, dll) mewarisi kelas ini.
+- **`director.py`**: **AI Director** yang mengontrol ritme permainan (pacing), menentukan kapan dan seberapa cepat zombie muncul.
+- **`score_manager.py`**: Menangani penyimpanan dan pembacaan skor tertinggi dari file `highscores.json`.
+- **`animation.py`**: Modul utilitas untuk memuat dan memproses frame animasi dari file GIF/Sprite.
 
-- `entities/`
+### 2. Entities (`entities/`)
 
-  - `character.py` — `Character` base yang turunan `pygame.sprite.Sprite` untuk reuse collider/image.
-  - `player.py` — `Player` menyimpan typed buffer, method `type_char`/`clear_typed` dan menggambar UI.
-  - `zombie.py` — `Zombie` punya `word`, `progress`, `speed`, dan method `type_char`, `is_dead`, `draw`.
-  - `factory.py` — `EntityFactory` untuk membuat player/zombie; memudahkan spawn dengan konfigurasi default.
+Objek-objek interaktif dalam permainan.
 
-- `assets/`
-  - Tempat menyimpan image, font, dan sound. Template awal kosong — isi dengan art & audio.
+- **`character.py`**: Kelas induk untuk semua karakter hidup.
+- **`player.py`**: Mengatur logika pemain, input keyboard, sistem HP, dan animasi menembak.
+- **`zombie.py`**: Mengatur logika musuh, pergerakan, deteksi kata yang diketik, dan animasi kematian/ledakan.
+- **`projectile.py`**: Objek peluru visual yang bergerak dari pemain ke target.
+- **`factory.py`**: Menerapkan **Factory Pattern** untuk pembuatan objek (Player & Zombie) secara terpusat.
 
-## Contracts / Expectations
+### 3. States (`states/`)
 
-- State
+Implementasi konkret dari setiap tampilan permainan.
 
-  - Input: `handle_event(self, event)` menerima event Pygame.
-  - Update: `update(self, dt)` menerima delta-time (detik) untuk update logika.
-  - Draw: `draw(self, screen)` menerima `pygame.Surface` untuk menggambar.
+- **`menu_state.py`**: Menu utama (Mulai, Setting, Keluar).
+- **`game_state.py`**: Logika inti gameplay (Update loop, rendering objek, input handling).
+- **`settings_state.py`**: Menu pengaturan untuk mengubah tingkat kesulitan atau volume.
+- **`game_over_state.py`**: Layar akhir permainan yang menampilkan skor akhir.
 
-- Entity
+### 4. Root Files
 
-  - `Character` harus menjadi `pygame.sprite.Sprite`, memiliki `image` dan `rect`.
-  - `Player` & `Zombie` mempunyai API minimal: `update(dt)` + specialized methods (`type_char`, `is_dead`, `draw` pada `Zombie`).
+- **`main.py`**: Titik masuk (Entry Point) aplikasi.
+- **`settings.py`**: Menyimpan konstanta global seperti Resolusi Layar, Warna, Path Aset, dan FPS.
 
-- Factory
-  - `EntityFactory.create_player()` -> `Player`
-  - `EntityFactory.create_zombie()` -> `Zombie`
+## 🧩 Design Patterns
 
-Jika kamu mengganti interface ini, pastikan `GameState` masih memanggil method yang benar atau perbarui `GameState`.
+Kode ini menerapkan beberapa Design Pattern:
 
-## Cara menambah `State`
+1.  **State Pattern**: Digunakan untuk mengelola alur permainan. `Game` class memegang referensi ke `State` saat ini, memungkinkan pergantian tampilan tanpa logika `if-else` yang rumit.
+2.  **Factory Pattern**: `EntityFactory` digunakan untuk menginstansiasi objek game kompleks seperti Zombie dan Player, memisahkan logika pembuatan dari logika penggunaan.
+3.  **Singleton (via Static Methods)**: `ScoreManager` menggunakan metode statis untuk diakses dari mana saja tanpa perlu instansiasi berulang.
 
-1. Buat file baru di `states/` misal `pause_state.py`.
-2. Turunkan dari `State` dan implement `handle_event`, `update`, `draw`.
-3. Pada saat transisi, panggil `game.change_state(PauseState)` dari state aktif.
+## ⌨️ Kontrol
 
-## Cara menambah perilaku Zombie (Strategy)
+- **Keyboard (A-Z)**: Ketik huruf sesuai kata di atas kepala zombie untuk menyerang.
+- **Enter**: Konfirmasi pilihan di menu.
+- **Panah Atas / Bawah**: Navigasi menu.
+- **Panah Kiri / Kanan**: Mengubah nilai slider di pengaturan.
+- **Esc / Quit**: Keluar dari permainan.
 
-1. Buat interface `Behavior` (method: `update(zombie, dt)`), tambahkan folder `entities/behaviors/`.
-2. Implement beberapa kelas behavior: `Walk`, `Chase`, `Sprint`.
-3. Tambahkan property `behavior` pada `Zombie` dan delegasikan gerakan ke `self.behavior.update(self, dt)`.
-4. Factory bisa memilih behavior berdasarkan difficulty random/level.
+---
 
-## Testing
-
-- Gunakan `pytest` untuk unit tests pada factory/logic: contoh tes spawn, tes `type_char` untuk `Zombie`.
-
-Cara membuat & menjalankan `pytest` singkat:
-
-
-1. Struktur test (letakkan di `tests/`):
-
-```
-tests/
-  test_factory.py
-  test_zombie_typing.py
-  ...
-```
-
-2. Contoh test (file `tests/test_example.py`):
-
-```python
-def test_math_small():
-    assert 1 + 1 == 2
-```
-
-3. Headless Pygame pada CI / terminal: di file test yang butuh pygame, set env var sebelum import:
-
-```python
-import os
-os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
-import pygame
-```
-
-4. Menjalankan test:
-
-```bash
-pytest -q
-```
-
-5. Menjalankan test tertentu / single test:
-
-```bash
-pytest tests/test_zombie_typing.py -q
-pytest tests/test_zombie_typing.py::test_zombie_typing_progress -q
-pytest -k "zombie and typing" -q
-```
+_Dikembangkan oleh Fatih & Rhama - Semester 3 PBO FP_
