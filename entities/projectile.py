@@ -5,7 +5,7 @@ from core.animation import load_gif_frames
 class Projectile(pygame.sprite.Sprite):
     FRAMES = []
 
-    def __init__(self, start_pos, target_pos, speed=1200):
+    def __init__(self, start_pos, target_pos, speed=2500):
         super().__init__()
         if not Projectile.FRAMES:
             # Load frames once
@@ -27,7 +27,7 @@ class Projectile(pygame.sprite.Sprite):
             
         self.animation_index = 0
         self.animation_timer = 0.0
-        self.ANIMATION_SPEED = 0.005
+        self.ANIMATION_SPEED = 0.05
         
         # Calculate angle
         # The sprite faces UP by default. We need to correct this.
