@@ -49,14 +49,15 @@ class GameState(State):
         self.sfx_shoot = None
         self.sfx_death = None
         try:
-            shoot_path = "assets/gun-shot.wav"
+            shoot_path = "assets/sounds/gun-shot.wav"
             
             if os.path.exists(shoot_path):
                 self.sfx_shoot = pygame.mixer.Sound(shoot_path)
                 self.sfx_shoot.set_volume(0.4)
+            else:
                 print(f"Warning: Shoot SFX not found at {shoot_path}")
             
-            death_path = "assets/death.wav"
+            death_path = "assets/sounds/death.wav"
             
             if os.path.exists(death_path):
                 self.sfx_death = pygame.mixer.Sound(death_path)

@@ -41,8 +41,8 @@ class MenuState(State):
 
         self.sfx_select = None
         
-        backsound_path = "assets/Main Music.mp3"
-        path_select = "assets/click.wav"
+        backsound_path = "assets/sounds/Main Music.mp3"
+        path_select = "assets/sounds/click.wav"
             
         try:
             
