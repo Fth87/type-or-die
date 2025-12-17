@@ -5,7 +5,18 @@ from core.score_manager import ScoreManager
 from settings import WIDTH, HEIGHT, BG_COLOR, TEXT_COLOR
 
 class MenuState(State):
+    """
+    State untuk Menu Utama permainan.
+    
+    Menampilkan opsi untuk memulai permainan, pengaturan, dan keluar.
+    Juga menampilkan skor tertinggi.
+    """
     def __init__(self, game):
+        """
+        Inisialisasi MenuState.
+        
+        Memuat aset background, font, dan skor tertinggi.
+        """
         super().__init__(game)
         pygame.font.init()
         
@@ -33,6 +44,9 @@ class MenuState(State):
         self.best_score = ScoreManager.get_best_score()
 
     def handle_event(self, event):
+        """
+        Menangani input navigasi menu (Atas, Bawah, Enter).
+        """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 self.selected_index = (self.selected_index - 1) % len(self.menu_options)
@@ -44,6 +58,9 @@ class MenuState(State):
             self.game.quit()
 
     def execute_option(self):
+        """
+        Menjalankan aksi berdasarkan opsi menu yang dipilih.
+        """
         selection = self.menu_options[self.selected_index]
         if selection == "Mulai":
             from states.game_state import GameState
@@ -55,9 +72,15 @@ class MenuState(State):
             self.game.quit()
 
     def update(self, dt):
+        """
+        Update logika menu (tidak ada logika khusus per frame saat ini).
+        """
         pass
 
     def draw(self, screen):
+        """
+        Menggambar elemen menu ke layar.
+        """
         if self.background:
             screen.blit(self.background, (0, 0))
         else:

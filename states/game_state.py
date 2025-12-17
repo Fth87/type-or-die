@@ -8,7 +8,18 @@ from entities.projectile import Projectile
 import os
 
 class GameState(State):
+    """
+    State utama permainan (Gameplay).
+    
+    Mengatur logika permainan, spawning zombie, input pemain,
+    dan transisi ke Game Over.
+    """
     def __init__(self, game):
+        """
+        Inisialisasi GameState.
+        
+        Menyiapkan player, factory, director, dan background.
+        """
         super().__init__(game)
         self.factory = EntityFactory()
         self.player = self.factory.create_player()
@@ -19,6 +30,10 @@ class GameState(State):
         self.director = AIDirector()
         self.game_over_timer = 0.0
         self.is_game_over = False
+        
+        # Font UI
+        self.ui_font = pygame.font.SysFont(None, 24)
+
         bg_path = "assets/images/field/PNG/grass.png"
         if os.path.exists(bg_path):
             try:
@@ -30,6 +45,12 @@ class GameState(State):
             self.background = None
 
     def handle_event(self, event):
+        """
+        Menangani input pemain saat bermain.
+        
+        Mendeteksi ketikan karakter untuk menyerang zombie.
+        Jika salah ketik, pemain terkena damage.
+        """
         if self.is_game_over:
             return
 
@@ -61,6 +82,12 @@ class GameState(State):
             self.game.quit()
 
     def update(self, dt):
+        """
+        Update logika permainan setiap frame.
+        
+        Mengupdate posisi player, zombie, proyektil, dan mengecek kondisi kalah.
+        Menggunakan AIDirector untuk mengatur spawning zombie.
+        """
         if self.is_game_over:
             self.player.update(dt) # Update player animation during game over
             self.game_over_timer -= dt
@@ -95,6 +122,9 @@ class GameState(State):
                 return
 
     def draw(self, screen):
+        """
+        Menggambar elemen permainan ke layar.
+        """
         if self.background:
             screen.blit(self.background, (0, 0))
         else:
@@ -106,6 +136,5 @@ class GameState(State):
         for z in self.zombies:
             z.draw(screen)
 
-        font = pygame.font.SysFont(None, 24)
-        score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        score_text = self.ui_font.render(f"Score: {self.score}", True, (255, 255, 255))
         screen.blit(score_text, (WIDTH - 120, 10))

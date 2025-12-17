@@ -9,7 +9,15 @@ from settings import (
 )
 
 class AIDirector:
+    """
+    Kelas yang mengatur tingkat kesulitan permainan secara dinamis (AI Director).
+    
+    Mengontrol frekuensi spawn zombie dan kecepatan mereka berdasarkan skor pemain.
+    """
     def __init__(self):
+        """
+        Inisialisasi parameter kesulitan awal.
+        """
         # Difficulty Parameters
         self.current_difficulty_level = 1
         self.current_spawn_interval = INITIAL_SPAWN_INTERVAL
@@ -21,6 +29,15 @@ class AIDirector:
         self.time_since_last_spawn = 0
     
     def update(self, dt, current_score):
+        """
+        Memperbarui logika director setiap frame.
+
+        Mengecek apakah skor pemain sudah cukup untuk menaikkan tingkat kesulitan.
+
+        Args:
+            dt (float): Waktu delta.
+            current_score (int): Skor pemain saat ini.
+        """
         self.time_since_last_spawn += dt
         
         target_level = 1 + (current_score // self.score_threshold)
@@ -30,6 +47,11 @@ class AIDirector:
             self.current_difficulty_level = target_level
 
     def increase_difficulty(self):
+        """
+        Meningkatkan parameter kesulitan permainan.
+        
+        Mengurangi interval spawn dan meningkatkan kecepatan zombie.
+        """
         self.current_spawn_interval = max(
             MIN_SPAWN_INTERVAL, 
             self.current_spawn_interval - SPAWN_DECAY_RATE
@@ -45,11 +67,22 @@ class AIDirector:
             self.current_min_speed + (SPEED_INCREASE_RATE / 2)
         )
     def can_spawn(self):
+        """
+        Mengecek apakah sudah waktunya untuk memunculkan zombie baru.
 
+        Returns:
+            bool: True jika zombie harus dimunculkan, False jika tidak.
+        """
         if self.time_since_last_spawn >= self.current_spawn_interval:
             self.time_since_last_spawn = 0
             return True
         return False
 
     def get_speed_params(self):
+        """
+        Mendapatkan parameter kecepatan untuk zombie baru.
+
+        Returns:
+            tuple: (min_speed, max_speed)
+        """
         return int(self.current_min_speed), int(self.current_max_speed)
