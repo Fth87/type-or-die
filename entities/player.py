@@ -1,6 +1,7 @@
 import pygame
 from .character import Character
 from settings import WIDTH, HEIGHT, TEXT_COLOR
+from core.animation import load_gif_frames
 
 class Player(Character):
     def __init__(self):
@@ -17,6 +18,24 @@ class Player(Character):
         self.rect = self.image.get_rect()
         self.rect.midright = (WIDTH - 20, HEIGHT // 2)
         
+        # Explosion Animation
+        self.explosion_frames = load_gif_frames("assets/images/fire/meledak.gif", (100, 100))
+        self.exploding = False
+        self.explosion_index = 0
+        self.explosion_timer = 0.0
+        self.EXPLOSION_SPEED = 0.1
+
+        # HP System
+        self.hp = 3
+        self.hp_images = {}
+        for i in range(4):
+            try:
+                # Load HP images (hp0.svg to hp3.svg)
+                img = pygame.image.load(f"assets/images/hp/hp{i}.svg").convert_alpha()
+                self.hp_images[i] = pygame.transform.scale(img, (150, 100))
+            except Exception as e:
+                print(f"Warning: Could not load hp{i}.svg: {e}")
+
         self.speed = 300
         self.laser_thickness = 4
         self.laser_color = (0, 255, 255)
@@ -26,6 +45,17 @@ class Player(Character):
         self.typed = ""
 
     def update(self, dt):
+        if self.exploding:
+            self.explosion_timer += dt
+            if self.explosion_timer >= self.EXPLOSION_SPEED:
+                self.explosion_timer = 0
+                self.explosion_index += 1
+                if self.explosion_index < len(self.explosion_frames):
+                    self.image = self.explosion_frames[self.explosion_index]
+                    # Keep centered
+                    self.rect = self.image.get_rect(center=self.rect.center)
+            return
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             self.rect.y -= self.speed * dt
@@ -44,9 +74,24 @@ class Player(Character):
     def clear_typed(self):
         self.typed = ""
 
+    def take_damage(self):
+        self.hp -= 1
+        if self.hp < 0:
+            self.hp = 0
+
+    def explode(self):
+        if not self.exploding and self.explosion_frames:
+            self.exploding = True
+            self.explosion_index = 0
+            self.image = self.explosion_frames[0]
+            self.rect = self.image.get_rect(center=self.rect.center)
+
     def draw_ui(self, surface):
-        pygame.draw.rect(surface, self.laser_color, self.laser_rect)
+        if not self.exploding:
+            pygame.draw.rect(surface, self.laser_color, self.laser_rect)
+        
         surface.blit(self.image, self.rect)
         
-        text = self.font.render(f"Typed: {self.typed}", True, TEXT_COLOR)
-        surface.blit(text, (10, 10))
+        # Draw HP
+        if self.hp in self.hp_images:
+            surface.blit(self.hp_images[self.hp], (10, 10))
