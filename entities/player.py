@@ -1,6 +1,6 @@
 import pygame
 from .character import Character
-from settings import WIDTH, HEIGHT, TEXT_COLOR
+from settings import WIDTH, HEIGHT
 from core.animation import load_gif_frames
 
 class Player(Character):
@@ -9,17 +9,17 @@ class Player(Character):
         # Load image from assets
         try:
             original_image = pygame.image.load("assets/images/char/Hunter/Main.png").convert_alpha()
-            self.image = pygame.transform.scale(original_image, (64, 64)) # Scale to reasonable size
+            self.image = pygame.transform.scale(original_image, (160, 160)) # Scale to reasonable size
         except FileNotFoundError:
             print("Warning: Player image not found. Using placeholder.")
-            self.image = pygame.Surface((50, 50))
+            self.image = pygame.Surface((160, 160))
             self.image.fill((0, 100, 255))
             
         self.rect = self.image.get_rect()
         self.rect.midright = (WIDTH - 20, HEIGHT // 2)
         
         # Explosion Animation
-        self.explosion_frames = load_gif_frames("assets/images/fire/meledak.gif", (100, 100))
+        self.explosion_frames = load_gif_frames("assets/images/fire/meledak.gif", (150, 150))
         self.exploding = False
         self.explosion_index = 0
         self.explosion_timer = 0.0
@@ -37,7 +37,7 @@ class Player(Character):
                 print(f"Warning: Could not load hp{i}.svg: {e}")
 
         self.speed = 300
-        self.laser_thickness = 4
+        self.laser_thickness = 10
         self.laser_color = (0, 255, 255)
         self.laser_rect = pygame.Rect(0, 0, WIDTH, self.laser_thickness)
         
@@ -73,6 +73,12 @@ class Player(Character):
 
     def clear_typed(self):
         self.typed = ""
+
+    def set_laser_active(self, active):
+        if active:
+            self.laser_color = (255, 50, 50) # Reddish when aiming at zombie
+        else:
+            self.laser_color = (0, 255, 255) # Cyan default
 
     def take_damage(self):
         self.hp -= 1

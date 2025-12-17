@@ -6,7 +6,8 @@ class Game:
     def __init__(self, initial_state_cls):
         pygame.init()
         pygame.display.set_caption("Type Or Die - Base")
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        # Use FULLSCREEN and SCALED to fit the 1920x1080 game to the screen
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
         self.clock = pygame.time.Clock()
         self._running = True
         self.state = initial_state_cls(self)

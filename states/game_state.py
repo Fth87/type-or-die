@@ -69,6 +69,15 @@ class GameState(State):
             return
 
         self.player.update(dt)
+        
+        # Check laser alignment
+        is_aiming = False
+        for z in self.zombies:
+            if not z.dying and self.player.laser_rect.colliderect(z.rect):
+                is_aiming = True
+                break
+        self.player.set_laser_active(is_aiming)
+
         self.projectiles.update(dt)
         self.director.update(dt, self.score)
         if self.director.can_spawn():

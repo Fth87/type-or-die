@@ -9,7 +9,7 @@ class Zombie(Character):
     FALL_IMAGE = None
     EXPLOSION_FRAMES = []
     ANIMATION_SPEED = 0.1
-    SIZE = (80, 80)
+    SIZE = (150, 150)
 
     def __init__(self, pos, word, speed=60):
         super().__init__(pos)
