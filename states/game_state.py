@@ -46,6 +46,27 @@ class GameState(State):
         else:
             self.background = None
 
+        self.sfx_shoot = None
+        self.sfx_death = None
+        try:
+            shoot_path = "assets/gun-shot.wav"
+            
+            if os.path.exists(shoot_path):
+                self.sfx_shoot = pygame.mixer.Sound(shoot_path)
+                self.sfx_shoot.set_volume(0.4)
+                print(f"Warning: Shoot SFX not found at {shoot_path}")
+            
+            death_path = "assets/death.wav"
+            
+            if os.path.exists(death_path):
+                self.sfx_death = pygame.mixer.Sound(death_path)
+                self.sfx_death.set_volume(0.8) 
+            else:
+                print(f"Warning: Death SFX not found at {death_path}")
+
+        except Exception as e:
+            print(f"Audio Error: {e}")
+
     def handle_event(self, event):
         """
         Menangani input pemain saat bermain.
@@ -69,6 +90,9 @@ class GameState(State):
                             # Spawn projectile
                             self.projectiles.add(Projectile(self.player.rect.center, z.rect.center))
                             
+                            if self.sfx_shoot:
+                                self.sfx_shoot.play()
+
                             if result == "KILLED":
                                 self.score += 1
                                 if self.score > self.high_score:
@@ -78,6 +102,8 @@ class GameState(State):
                 if not hit_any:
                     self.player.take_damage()
                     if self.player.hp <= 0:
+                        if self.sfx_death:
+                            self.sfx_death.play()
                         self.player.explode()
                         self.is_game_over = True
                         self.game_over_timer = 1.5
