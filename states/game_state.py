@@ -2,6 +2,7 @@ import pygame
 from core.state import State
 from entities.factory import EntityFactory
 from core.director import AIDirector
+from core.score_manager import ScoreManager
 from settings import WIDTH, HEIGHT, BG_COLOR
 from states.game_over_state import GameOverState
 from entities.projectile import Projectile
@@ -32,7 +33,8 @@ class GameState(State):
         self.is_game_over = False
         
         # Font UI
-        self.ui_font = pygame.font.SysFont(None, 24)
+        self.ui_font = pygame.font.SysFont(None, 40)
+        self.high_score = ScoreManager.get_best_score()
 
         bg_path = "assets/images/field/PNG/grass.png"
         if os.path.exists(bg_path):
@@ -69,6 +71,8 @@ class GameState(State):
                             
                             if result == "KILLED":
                                 self.score += 1
+                                if self.score > self.high_score:
+                                    self.high_score = self.score
                             break
                 
                 if not hit_any:
@@ -136,5 +140,19 @@ class GameState(State):
         for z in self.zombies:
             z.draw(screen)
 
+        # Draw Score
         score_text = self.ui_font.render(f"Score: {self.score}", True, (255, 255, 255))
-        screen.blit(score_text, (WIDTH - 120, 10))
+        score_rect = score_text.get_rect(topright=(WIDTH - 20, 20))
+        
+        # Draw High Score
+        high_score_text = self.ui_font.render(f"High Score: {self.high_score}", True, (255, 215, 0))
+        high_score_rect = high_score_text.get_rect(topright=(WIDTH - 20, 60))
+
+        # Shadow for visibility
+        score_shadow = self.ui_font.render(f"Score: {self.score}", True, (0, 0, 0))
+        screen.blit(score_shadow, (score_rect.x + 2, score_rect.y + 2))
+        screen.blit(score_text, score_rect)
+
+        high_score_shadow = self.ui_font.render(f"High Score: {self.high_score}", True, (0, 0, 0))
+        screen.blit(high_score_shadow, (high_score_rect.x + 2, high_score_rect.y + 2))
+        screen.blit(high_score_text, high_score_rect)

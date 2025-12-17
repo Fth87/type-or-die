@@ -49,12 +49,6 @@ class SettingsState(State):
                 "step": 10
             },
             {
-                "label": "Difficulty",
-                "type": "select",
-                "value": 0, # Index dari choices
-                "choices": ["Easy", "Normal", "Hard", "Insane"]
-            },
-            {
                 "label": "Back",
                 "type": "button"
             }
