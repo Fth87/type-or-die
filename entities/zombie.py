@@ -2,10 +2,12 @@ import pygame
 import os
 from .character import Character
 from settings import TEXT_COLOR
+from core.animation import load_gif_frames
 
 class Zombie(Character):
     FRAMES = []
     FALL_IMAGE = None
+    EXPLOSION_FRAMES = []
     ANIMATION_SPEED = 0.1
     SIZE = (80, 80)
 
@@ -20,11 +22,12 @@ class Zombie(Character):
         self.DEATH_DURATION = 1.0
         self.exact_x = float(pos[0])
 
-        if not Zombie.FRAMES or not Zombie.FALL_IMAGE:
+        if not Zombie.FRAMES or not Zombie.FALL_IMAGE or not Zombie.EXPLOSION_FRAMES:
             self._load_assets()
 
         self.current_frame_index = 0
         self.animation_timer = 0.0
+        self.explosion_index = 0
 
         if Zombie.FRAMES:
             self.image = Zombie.FRAMES[0]
@@ -56,10 +59,23 @@ class Zombie(Character):
                     Zombie.FALL_IMAGE = pygame.transform.scale(img, Zombie.SIZE)
                 except pygame.error:
                     pass
+        
+        if not Zombie.EXPLOSION_FRAMES:
+            Zombie.EXPLOSION_FRAMES = load_gif_frames("assets/images/fire/meledak.gif", (100, 100))
 
     def update(self, dt):
         if self.dying:
             self.death_timer += dt
+            
+            # Play explosion animation
+            if Zombie.EXPLOSION_FRAMES:
+                self.animation_timer += dt
+                if self.animation_timer >= 0.1: # Explosion speed
+                    self.animation_timer = 0
+                    self.explosion_index += 1
+                    if self.explosion_index < len(Zombie.EXPLOSION_FRAMES):
+                        self.image = Zombie.EXPLOSION_FRAMES[self.explosion_index]
+                        self.rect = self.image.get_rect(center=self.rect.center)
             return
 
         self.exact_x += self.speed * dt
@@ -74,7 +90,14 @@ class Zombie(Character):
 
     def start_dying(self):
         self.dying = True
-        if Zombie.FALL_IMAGE:
+        self.animation_timer = 0
+        self.explosion_index = 0
+        if Zombie.EXPLOSION_FRAMES:
+            self.image = Zombie.EXPLOSION_FRAMES[0]
+            self.rect = self.image.get_rect(center=self.rect.center)
+            # Adjust duration to match animation length
+            self.DEATH_DURATION = len(Zombie.EXPLOSION_FRAMES) * 0.1
+        elif Zombie.FALL_IMAGE:
             self.image = Zombie.FALL_IMAGE
             old_center = self.rect.center
             self.rect = self.image.get_rect(center=old_center)
@@ -100,8 +123,7 @@ class Zombie(Character):
 
     def draw(self, screen):
         if self.dying:
-            alpha = max(0, 255 - int((self.death_timer / self.DEATH_DURATION) * 255))
-            self.image.set_alpha(alpha)
+            # No alpha fade for explosion, just draw it
             screen.blit(self.image, self.rect)
             return
 
