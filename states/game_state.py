@@ -15,7 +15,7 @@ class GameState(State):
         self.spawn_timer = 0.0
         self.score = 0
         self.director = AIDirector()
-        bg_path = "assets/field/PNG/grass.png"
+        bg_path = "assets/images/field/PNG/grass.png"
         if os.path.exists(bg_path):
             try:
                 raw_image = pygame.image.load(bg_path).convert()

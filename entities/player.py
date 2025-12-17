@@ -5,8 +5,15 @@ from settings import WIDTH, HEIGHT, TEXT_COLOR
 class Player(Character):
     def __init__(self):
         super().__init__((0, 0))
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((0, 100, 255))
+        # Load image from assets
+        try:
+            original_image = pygame.image.load("assets/images/char/Hunter/Main.png").convert_alpha()
+            self.image = pygame.transform.scale(original_image, (64, 64)) # Scale to reasonable size
+        except FileNotFoundError:
+            print("Warning: Player image not found. Using placeholder.")
+            self.image = pygame.Surface((50, 50))
+            self.image.fill((0, 100, 255))
+            
         self.rect = self.image.get_rect()
         self.rect.midright = (WIDTH - 20, HEIGHT // 2)
         
