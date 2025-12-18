@@ -10,7 +10,7 @@ from settings import (
 
 class AIDirector:
     """
-    Kelas yang mengatur tingkat kesulitan permainan secara dinamis (AI Director).
+    Kelas yang mengatur tingkat kesulitan permainan secara dinamis.
     
     Mengontrol frekuensi spawn zombie dan kecepatan mereka berdasarkan skor pemain.
     """
