@@ -39,6 +39,27 @@ class MenuState(State):
             self.menu_font = pygame.font.SysFont(None, 40)
             self.score_font = pygame.font.SysFont(None, 30)
 
+        self.sfx_select = None
+        
+        backsound_path = "assets/sounds/Main Music.mp3"
+        path_select = "assets/sounds/click.wav"
+            
+        try:
+            
+            if os.path.exists(backsound_path):
+                
+                pygame.mixer.music.load(backsound_path)
+                pygame.mixer.music.set_volume(0.5) 
+                pygame.mixer.music.play(-1)
+            else:
+                print(f"Warning: Backsound not found at {backsound_path}")
+
+            if os.path.exists(path_select):
+                self.sfx_select = pygame.mixer.Sound(path_select)
+                self.sfx_select.set_volume(0.6)
+        except Exception as e:
+            print(f"Audio Error: {e}")
+
         self.menu_options = ["Mulai", "Setting", "Keluar"]
         self.selected_index = 0
         self.best_score = ScoreManager.get_best_score()
@@ -53,7 +74,9 @@ class MenuState(State):
             elif event.key == pygame.K_DOWN:
                 self.selected_index = (self.selected_index + 1) % len(self.menu_options)
             elif event.key == pygame.K_RETURN:
+                if self.sfx_select: self.sfx_select.play()
                 self.execute_option()
+                
         elif event.type == pygame.QUIT:
             self.game.quit()
 
